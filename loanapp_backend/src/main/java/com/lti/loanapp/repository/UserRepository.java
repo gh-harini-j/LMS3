@@ -8,6 +8,6 @@ import com.lti.loanapp.entity.User;
 public interface UserRepository extends JpaRepository<User, Long> 
 {
 
-    User findByUsernameAndPassword(String username, String password);
+    User findByUsernameAndPassword(String userName, String password);
     // Custom query methods can be defined here if needed
 }
