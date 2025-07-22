@@ -1,8 +1,12 @@
 package com.lti.loanapp.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -23,16 +27,31 @@ public class EMIPayment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "loan_id")
+    /**
+     * The loan associated with this EMI.
+     * Many EMIs belong to one loan.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
 
+    @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
 
-    private LocalDate paidDate;
+    @Column(name = "paid_date")
+    private LocalDate paidDate; // Nullable until paid
 
-    private double emiAmount;
+    @Column(name = "emi_amount", nullable = false, precision = 15, scale = 2)
+    private BigDecimal emiAmount;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "emi_status", nullable = false)
     private EMIStatus emiStatus;
+
+    /**
+     * One-to-one relationship with Penalty.
+     * If an EMI is deleted, its penalty is also removed.
+     */
+    @OneToOne(mappedBy = "emiPayment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Penalty penalty;
 }

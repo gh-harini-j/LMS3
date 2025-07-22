@@ -1,8 +1,13 @@
+
 package com.lti.loanapp.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -13,26 +18,53 @@ import java.util.List;
 @Table(name = "loans")
 public class Loan {
 
+    public enum LoanStatus {
+        PENDING,
+        APPROVED,
+        REJECTED,
+        CLOSED
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    /**
+     * The user (customer) who applied for the loan.
+     * Fetch type is LAZY to optimize performance.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user; // customer
+    private User user;
 
+    @Column(name = "loan_type", nullable = false)
     private String loanType;
 
-    private double amount;
+    /**
+     * BigDecimal is the standard for monetary values.
+     * Precision: total digits, Scale: digits after decimal.
+     */
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal amount;
 
-    private int tenure;
+    @Column(nullable = false)
+    private int tenure; // Duration in months
 
-    private String status; // PENDING, APPROVED, REJECTED
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private LoanStatus status;
 
-    @ManyToOne
+    /**
+     * Optional assignment to a loan officer.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_officer_id")
     private User assignedOfficer;
 
-    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
+    /**
+     * EMIs linked to this loan.
+     * No cascading to avoid accidental data loss.
+     */
+    @OneToMany(mappedBy = "loan", fetch = FetchType.LAZY)
     private List<EMIPayment> emiPayments;
 }
