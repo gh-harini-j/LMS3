@@ -27,7 +27,7 @@ public class AuthService
     public ResponseEntity<Map<String, Object>> loginUser(String username, String password)
     {
         // Logic for user login
-        User user = userRepository.findByUsernameAndPassword(username, password);
+        User user = userRepository.findByUserNameAndPassword(username, password);
         if (user != null) {
             return ResponseEntity.ok(Map.of("user", user, "message", "Login successful"));
         } 
