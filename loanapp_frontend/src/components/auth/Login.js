@@ -19,7 +19,7 @@ const Login = () => {
       const { data } = await login(form); // Call login API
       setAuth(data); // Save user data in context
       ToastNotification.success('Login successful!');
-      navigate('/'); // Redirect to home page
+      navigate('/landing'); // Redirect to landing page
     } catch (err) {
       ToastNotification.error('Invalid credentials');
     }

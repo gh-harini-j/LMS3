@@ -20,6 +20,10 @@ export default function RegistrationPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
  
+
+    // Track if username field has been touched
+    const [userNameTouched, setUserNameTouched] = useState(false);
+
     // Handles changes in any input field and updates the state
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -27,14 +31,21 @@ export default function RegistrationPage() {
             ...prevState,
             [name]: value
         }));
+        if (name === 'userName') setUserNameTouched(true);
+    };
+
+    // Username validation: starts with a letter, only letters, numbers, -, _ allowed
+    const isValidUsername = (username) => {
+        return /^[A-Za-z][A-Za-z0-9_-]*$/.test(username);
     };
  
+
+
     // Handles the form submission
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevents the default browser refresh on form submission
-        setLoading(true);
         setError(null);
- 
+        setLoading(true);
         console.log('Submitting registration data:', formData);
        
         // Senior Dev Note: In a production environment, allowing public role selection
@@ -107,10 +118,18 @@ export default function RegistrationPage() {
                                         name="userName"
                                         value={formData.userName}
                                         onChange={handleChange}
+                                        onBlur={() => setUserNameTouched(true)}
                                         required
                                         className="form-input"
                                         placeholder="Enter your username"
+                                        autoComplete="username"
+                                        inputMode="text"
                                     />
+                                    {userNameTouched && formData.userName && !isValidUsername(formData.userName) && (
+                                        <div className="error-message" style={{ color: 'red', fontSize: '0.7em', marginTop: '0.25rem' }}>
+                                            Username must start with a letter and can only contain letters, numbers, hyphens (-), and underscores (_).
+                                        </div>
+                                    )}
                                 </div>
                                 <div>
                                     <label htmlFor="email" className="form-label">
@@ -152,8 +171,8 @@ export default function RegistrationPage() {
                                         }}
                                         style={{
                                             position: 'absolute',
-                                            right: '0.75rem',
-                                            top: '50%',
+                                            right: '0.5rem',
+                                            top: '60%',
                                             transform: 'translateY(-50%)',
                                             background: 'none',
                                             border: 'none',
